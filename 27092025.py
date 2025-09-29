@@ -3,6 +3,53 @@ https://www.hackerrank.com/challenges/sherlock-and-cost/problem
 """
 
 
+def countArray(n, k, x):
+    """
+    Construct array A of length n where:
+    - A[0] = 1
+    - A[n - 1] = x
+    - 1 <= A[i] <= k
+    - A[i] != A[i+1]
+
+    Return the count of all possible ways to construct A
+
+    Approach
+    dp[i]: number of valid ways to construct array up until here
+
+    at each position there is k - 1 options
+    e.g.
+    dp[0] = 1
+    dp[1] = dp[0] * (k - 1) e.g. 1 * 2
+    then again, for each number, there is 2 other valid options
+    dp[2] = dp[1] * (k - 1)
+    now, we get to the last element which has to be x
+    we now have to delete all paths that led to here, which depend on having
+    x in position n - 1, since if 1 <= x <= k, then that means we
+    have to subtract 1/k paths from dp[i-1] to get the result
+    """
+
+    dp = [0] * n
+
+    dp[0] = 1
+    init_shares = [0] * k
+    init_shares[0] = 1
+    shares = [[0] * k] * n  # tracks the share of each number at position i
+    shares[0] = init_shares
+
+    for i in range(1, n - 1):
+        dp[i] = dp[i - 1] * (k - 1)
+        tmp_shares = []
+
+        for s in shares[i - 1]:
+            nom = 1 - s
+            # every entry in shares[i - 1] will appear k times in shares[i]
+            denom = k - 1
+            tmp_shares.append(nom / denom)
+        shares[i] = tmp_shares
+
+    return int(dp[n - 2] * (1 - shares[n - 2][x - 1]))
+
+
 def cost(B: list[int]) -> int:
     """
     Insight: for three consecutive numbers a, b, c in A
