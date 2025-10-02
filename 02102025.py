@@ -102,3 +102,60 @@ if __name__ == "__main__":
         print("Alignment:")
         print(format_alignment_spaced(A, B))
         print()
+
+
+class Solution(object):
+    def restoreIpAddresses(self, s):
+        """
+        :type s: str
+        :rtype: List[str]
+        """
+
+        def _is_valid_block(s) -> bool:
+            return
+
+        def _get_valid_IPs(start: str, end: str):
+            print("start", start, "end", end)
+            # base cases
+            if start == "":
+                return [end]
+
+            # recursion
+            valid_ips = []
+
+            # case 1: insert .
+            if end.find(".") > -1:
+                prev_block = end[0 : end.find(".")]
+            else:
+                prev_block = end
+
+            print("prev_block", prev_block)
+
+            conditions = [
+                len(start) >= 1,  # valid IP cannot end with .
+                not (len(start) > (4 - end.count(".") - 1) * 3),
+                not (prev_block.startswith("0") if len(prev_block) > 1 else False),
+                not (prev_block == ""),  # no repeat .
+            ]
+
+            if not (prev_block == ""):
+                conditions.append(
+                    int(prev_block) <= 255  # no blocks larger 255
+                )
+
+            print("conditions\n", conditions)
+
+            if all(conditions):
+                valid_ips.extend(_get_valid_IPs(start, "." + end))
+
+            if _is_valid_block(start[-1] + end):
+                valid_ips.extend(_get_valid_IPs(start[0:-1], start[-1] + end))
+
+            return valid_ips
+
+        if len(s) > 12:
+            return []
+
+        valid_IPs = _get_valid_IPs(s[0:-1], s[-1])  # 2552551113, 5
+        print(valid_IPs)
+        return valid_IPs
