@@ -34,3 +34,53 @@ class Solution:
                 max_sum = dp[i]
 
         return max_sum
+
+
+# https://leetcode.com/problems/edit-distance/?envType=problem-list-v2&envId=dynamic-programming
+class Solution:
+    def minDistance(self, word1: str, word2: str) -> int:
+        """
+        I think the question here is:
+        - Is this just needleman wunsch?
+
+        The best nw alignment minimizes the levenshtein distance and
+        the operations are the definition of exactly that
+
+        Insert: gap in word2
+        Delete: gap in word1
+        Replace: just normal mismatch
+
+        Ok I think this is identical. Then, let's go about this:
+
+        we only need to return the min ops so no backtracking
+
+        this means we just need the matrix, fill it partially and then compute min(up, diag, left)
+        for each cell row by row
+        """
+        from pprint import pprint
+
+        N = len(word1)
+        M = len(word2)
+
+        dp = [[None] * (M + 1) for i in range(N + 1)]
+
+        # top left corner is gap gap and thus 0
+        dp[0][0] = 0
+
+        # fill first row left to right
+        for i in range(1, M + 1):
+            dp[0][i] = i
+
+        # fill first column top to bottom
+        for i in range(1, N + 1):
+            dp[i][0] = i
+
+        for j in range(1, M + 1):
+            for i in range(1, N + 1):
+                left = 1 + dp[i][j - 1]
+                up = 1 + dp[i - 1][j]
+                match = 0 if word1[i - 1] == word2[j - 1] else 1
+                diag = dp[i - 1][j - 1] + match
+                dp[i][j] = min(left, up, diag)
+
+        return dp[-1][-1]
